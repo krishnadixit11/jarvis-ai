@@ -7,27 +7,72 @@ class Brain:
 
         command = command.lower().strip()
 
-        JarvisLogger.info(f"Processing Command : {command}")
+        JarvisLogger.info(f"Processing Command: {command}")
 
-        if "youtube" in command:
-            return "OPEN_YOUTUBE"
+        # ==========================
+        # Windows Commands
+        # ==========================
 
-        elif "google" in command:
-            return "OPEN_google"
+        if "notepad" in command:
+            return "OPEN_NOTEPAD"
 
-        elif "time" in command:
+        if "calculator" in command or "calc" in command:
+            return "OPEN_CALCULATOR"
+
+        if "paint" in command:
+            return "OPEN_PAINT"
+
+        if "command prompt" in command or "cmd" in command:
+            return "OPEN_CMD"
+
+        if "file explorer" in command or "explorer" in command:
+            return "OPEN_EXPLORER"
+
+        # ==========================
+        # Browser Commands
+        # ==========================
+
+        if command.startswith("open "):
+            website = command.replace("open ", "").strip()
+            return ("OPEN_WEBSITE", website)
+
+        if command.startswith("search ") and " on google" in command:
+            query = command.replace("search ", "").replace(" on google", "").strip()
+            return ("GOOGLE_SEARCH", query)
+
+        if command.startswith("search ") and " on youtube" in command:
+            query = command.replace("search ", "").replace(" on youtube", "").strip()
+            return ("YOUTUBE_SEARCH", query)
+
+        # ==========================
+        # Utility Commands
+        # ==========================
+
+        if "time" in command:
             return "GET_TIME"
 
-        elif "date" in command:
+        if "date" in command:
             return "GET_DATE"
 
-        elif "hello" in command:
+        # ==========================
+        # Greetings
+        # ==========================
+
+        if "hello" in command or "hi" in command:
             return "GREET"
 
-        elif "who are you" in command:
+        if "who are you" in command:
             return "INTRO"
 
-        elif command in ["exit", "quit", "stop"]:
+        # ==========================
+        # Exit
+        # ==========================
+
+        if command in ["exit", "quit", "stop"]:
             return "EXIT"
+
+        # ==========================
+        # Default
+        # ==========================
 
         return "AI_CHAT"

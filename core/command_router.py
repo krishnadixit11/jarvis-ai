@@ -1,39 +1,60 @@
-from automation.browser import BrowserAutomation
-from core.logger import JarvisLogger
 from datetime import datetime
+
+from automation.browser import BrowserAutomation
+from automation.windows import WindowsAutomation
 
 
 class CommandRouter:
 
     def execute(self, action):
 
-        if action == "OPEN_YOUTUBE":
-            BrowserAutomation.open_youtube()
-            return "Opening YouTube."
+        # -----------------------------
+        # Browser Commands
+        # -----------------------------
+        if isinstance(action, tuple):
 
-        elif action == "OPEN_google":
-            BrowserAutomation.open_google()
-            return "Opening Google."
+            intent, value = action
 
-        elif action == "GET_TIME":
-            current = datetime.now().strftime("%I:%M %p")
-            JarvisLogger.info(current)
-            return f"The time is {current}"
+            if intent == "OPEN_WEBSITE":
+                return BrowserAutomation.open_website(value)
 
-        elif action == "GET_DATE":
-            current = datetime.now().strftime("%d %B %Y")
-            return f"Today is {current}"
+            if intent == "GOOGLE_SEARCH":
+                return BrowserAutomation.google_search(value)
 
-        elif action == "INTRO":
+            if intent == "YOUTUBE_SEARCH":
+                return BrowserAutomation.youtube_search(value)
+
+        # -----------------------------
+        # Windows Commands
+        # -----------------------------
+        if action == "OPEN_NOTEPAD":
+            return WindowsAutomation.open_notepad()
+
+        if action == "OPEN_CALCULATOR":
+            return WindowsAutomation.open_calculator()
+
+        if action == "OPEN_PAINT":
+            return WindowsAutomation.open_paint()
+
+        if action == "OPEN_CMD":
+            return WindowsAutomation.open_cmd()
+
+        if action == "OPEN_EXPLORER":
+            return WindowsAutomation.open_explorer()
+
+        # -----------------------------
+        # Utility Commands
+        # -----------------------------
+        if action == "GET_TIME":
+            return datetime.now().strftime("Current time is %I:%M %p")
+
+        if action == "GET_DATE":
+            return datetime.now().strftime("Today is %d %B %Y")
+
+        if action == "INTRO":
             return "I am Jarvis, your AI assistant."
 
-        elif action == "GREET":
+        if action == "GREET":
             return "Hello Krishna."
-
-        elif action == "EXIT":
-            return "Goodbye!"
-
-        elif action == "AI_CHAT":
-            return "Sorry, I don't know how to do that yet."
 
         return None
