@@ -1,0 +1,13 @@
+openai
+python-dotenv
+requests
+SpeechRecognition
+edge-tts
+PyAudio
+pygame
+opencv-python
+numpy
+pillow
+PySide6
+loguru
+rich
