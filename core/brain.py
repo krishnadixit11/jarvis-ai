@@ -27,7 +27,12 @@ class Brain:
 
         if "file explorer" in command or "explorer" in command:
             return "OPEN_EXPLORER"
+        
+        if "screenshot" in command:
+            return "TAKE_SCREENSHOT"
 
+        if "lock computer" in command or "lock pc" in command:
+            return "LOCK_PC"
         # ==========================
         # File Commands
         # ==========================

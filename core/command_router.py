@@ -2,6 +2,7 @@ from datetime import datetime
 from automation.file_manager import FileManager
 from automation.browser import BrowserAutomation
 from automation.windows import WindowsAutomation
+from automation.system_control import SystemControl
 
 
 class CommandRouter:
@@ -56,6 +57,15 @@ class CommandRouter:
           return FileManager.open_documents()
 
         # -----------------------------
+        # System Commands
+        # -----------------------------
+        if action == "TAKE_SCREENSHOT":
+            return SystemControl.take_screenshot()
+
+        if action == "LOCK_PC":
+            return SystemControl.lock_pc()
+        
+        # -----------------------------
         # Utility Commands
         # -----------------------------
         if action == "GET_TIME":
@@ -71,3 +81,4 @@ class CommandRouter:
             return "Hello Krishna."
 
         return None
+        
