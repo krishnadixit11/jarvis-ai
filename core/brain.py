@@ -33,6 +33,12 @@ class Brain:
 
         if "lock computer" in command or "lock pc" in command:
             return "LOCK_PC"
+
+        if "open camera" in command or "start camera" in command:
+            return "OPEN_CAMERA"
+
+        if "take photo" in command or "capture photo" in command:
+            return "TAKE_PHOTO"
         
         if "increase volume" in command or "volume up" in command:
             return "VOLUME_UP"

@@ -1,3 +1,4 @@
+from automation.camera import CameraAutomation
 from datetime import datetime
 from automation.file_manager import FileManager
 from automation.browser import BrowserAutomation
@@ -59,6 +60,12 @@ class CommandRouter:
         # -----------------------------
         # System Commands
         # -----------------------------
+        if action == "OPEN_CAMERA":
+            return CameraAutomation.open_camera()
+
+        if action == "TAKE_PHOTO":
+            return CameraAutomation.take_photo()
+        
         if action == "TAKE_SCREENSHOT":
             return SystemControl.take_screenshot()
 
