@@ -3,56 +3,111 @@ from core.speech import SpeechRecognizer
 from core.logger import JarvisLogger
 from core.brain import Brain
 from core.command_router import CommandRouter
-
-from ai.chat import ChatAI
+from core.wake_word import WakeWord
 
 
 class JarvisAssistant:
 
     def __init__(self):
+
         self.voice = VoiceEngine()
+
         self.listener = SpeechRecognizer()
+
         self.brain = Brain()
+
         self.router = CommandRouter()
-        self.ai = ChatAI()
+
+        self.wake_word = WakeWord()
+
 
     def start(self):
 
-        JarvisLogger.success("JARVIS Started Successfully")
+        JarvisLogger.success(
+            "JARVIS Started Successfully"
+        )
 
-        self.voice.speak("Hello Krishna. I am ready.")
+
+        self.voice.speak(
+            "Hello Krishna. I am ready."
+        )
+
 
         while True:
 
+
             command = self.listener.listen()
+
 
             if not command:
                 continue
 
-            action = self.brain.process(command)
 
-            JarvisLogger.info(f"Action : {action}")
 
-            if action == "EXIT":
-                self.voice.speak("Goodbye Krishna. Have a nice day.")
-                break
+            # =========================
+            # Wake Word Check
+            # =========================
 
-            # -----------------------------
-            # AI Chat
-            # -----------------------------
-            if action == "AI_CHAT":
-
-                response = self.ai.ask(command)
-
-                if response:
-                    self.voice.speak(response)
+            if not self.wake_word.detect(command):
 
                 continue
 
-            # -----------------------------
-            # Automation
-            # -----------------------------
+
+
+            # Remove wake word
+
+            command = command.replace(
+                "jarvis",
+                ""
+            ).strip()
+
+
+
+            if not command:
+                self.voice.speak(
+                    "Yes Krishna."
+                )
+                continue
+
+
+
+            # =========================
+            # Brain Processing
+            # =========================
+
+            action = self.brain.process(command)
+
+
+            JarvisLogger.info(
+                f"Action : {action}"
+            )
+
+
+
+            # =========================
+            # Exit
+            # =========================
+
+            if action == "EXIT":
+
+                self.voice.speak(
+                    "Goodbye Krishna. Have a nice day."
+                )
+
+                break
+
+
+
+            # =========================
+            # Execute Command
+            # =========================
+
             response = self.router.execute(action)
 
+
+
             if response:
-                self.voice.speak(response)
+
+                self.voice.speak(
+                    response
+                )
