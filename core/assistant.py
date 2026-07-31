@@ -4,6 +4,8 @@ from core.logger import JarvisLogger
 from core.brain import Brain
 from core.command_router import CommandRouter
 
+from ai.chat import ChatAI
+
 
 class JarvisAssistant:
 
@@ -12,6 +14,7 @@ class JarvisAssistant:
         self.listener = SpeechRecognizer()
         self.brain = Brain()
         self.router = CommandRouter()
+        self.ai = ChatAI()
 
     def start(self):
 
@@ -34,6 +37,21 @@ class JarvisAssistant:
                 self.voice.speak("Goodbye Krishna. Have a nice day.")
                 break
 
+            # -----------------------------
+            # AI Chat
+            # -----------------------------
+            if action == "AI_CHAT":
+
+                response = self.ai.ask(command)
+
+                if response:
+                    self.voice.speak(response)
+
+                continue
+
+            # -----------------------------
+            # Automation
+            # -----------------------------
             response = self.router.execute(action)
 
             if response:

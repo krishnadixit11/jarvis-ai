@@ -29,6 +29,18 @@ class Brain:
             return "OPEN_EXPLORER"
 
         # ==========================
+        # File Commands
+        # ==========================
+
+        if command in ["open desktop", "open my desktop"]:
+            return "OPEN_DESKTOP"
+
+        if command in ["open downloads", "open download", "downloads", "download"]:
+            return "OPEN_DOWNLOADS"
+
+        if command in ["open documents", "open document", "documents", "document"]:
+            return "OPEN_DOCUMENTS"
+        # ==========================
         # Browser Commands
         # ==========================
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from automation.file_manager import FileManager
 from automation.browser import BrowserAutomation
 from automation.windows import WindowsAutomation
 
@@ -41,6 +41,19 @@ class CommandRouter:
 
         if action == "OPEN_EXPLORER":
             return WindowsAutomation.open_explorer()
+
+        # -----------------------------
+        # File Commands
+        # -----------------------------
+
+        if action == "OPEN_DESKTOP":
+          return FileManager.open_desktop()
+
+        if action == "OPEN_DOWNLOADS":
+          return FileManager.open_downloads()
+
+        if action == "OPEN_DOCUMENTS": 
+          return FileManager.open_documents()
 
         # -----------------------------
         # Utility Commands
