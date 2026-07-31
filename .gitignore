@@ -14,6 +14,9 @@ venv/
 logs/
 *.log
 
+# Screenshots
+screenshots/
+
 # VS Code
 .vscode/
 
