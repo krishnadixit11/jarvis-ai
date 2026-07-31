@@ -64,6 +64,15 @@ class CommandRouter:
 
         if action == "LOCK_PC":
             return SystemControl.lock_pc()
+
+        if action == "VOLUME_UP":
+            return SystemControl.volume_up()
+
+        if action == "VOLUME_DOWN":
+            return SystemControl.volume_down()
+
+        if action == "MUTE_VOLUME":
+            return SystemControl.mute_volume()
         
         # -----------------------------
         # Utility Commands

@@ -33,6 +33,15 @@ class Brain:
 
         if "lock computer" in command or "lock pc" in command:
             return "LOCK_PC"
+        
+        if "increase volume" in command or "volume up" in command:
+            return "VOLUME_UP"
+
+        if "decrease volume" in command or "volume down" in command:
+            return "VOLUME_DOWN"
+
+        if "mute volume" in command or "mute" == command:
+            return "MUTE_VOLUME"
         # ==========================
         # File Commands
         # ==========================

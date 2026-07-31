@@ -1,4 +1,6 @@
+
 import os
+import pyautogui
 import ctypes
 from datetime import datetime
 
@@ -11,6 +13,21 @@ from core.logger import JarvisLogger
 
 
 class SystemControl:
+
+    @staticmethod
+    def volume_up():
+        pyautogui.press("volumeup")
+        return "Volume increased."
+
+    @staticmethod
+    def volume_down():
+        pyautogui.press("volumedown")
+        return "Volume decreased."
+
+    @staticmethod
+    def mute_volume():
+        pyautogui.press("volumemute")
+        return "Volume muted."
 
     @staticmethod
     def take_screenshot():

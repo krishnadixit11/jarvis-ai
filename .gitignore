@@ -23,3 +23,9 @@ screenshots/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Test files
+test_*.py
+
+# IDE settings
+.idea/
