@@ -1,53 +1,247 @@
+import difflib
+
 from core.logger import JarvisLogger
 
 
 class Brain:
 
-    def process(self, command: str):
+    def __init__(self):
+
+        # ===========================
+        # Known Applications
+        # ===========================
+
+        self.apps = [
+
+            "chrome",
+            "google chrome",
+            "edge",
+            "firefox",
+
+            "vscode",
+            "visual studio code",
+            "pycharm",
+            "android studio",
+
+            "git bash",
+            "terminal",
+            "cmd",
+            "command prompt",
+
+            "calculator",
+            "paint",
+            "notepad",
+            "explorer",
+            "file explorer",
+
+            "word",
+            "excel",
+            "powerpoint",
+
+            "spotify",
+            "vlc",
+
+            "telegram",
+            "discord",
+            "whatsapp",
+
+            "steam"
+
+        ]
+
+        # ===========================
+        # Websites
+        # ===========================
+
+        self.websites = [
+
+            "youtube",
+            "google",
+            "github",
+            "chatgpt",
+            "gmail",
+            "linkedin",
+            "facebook",
+            "instagram",
+            "reddit"
+
+        ]
+
+        # ===========================
+        # App Launch Prefixes
+        # ===========================
+
+        self.launch_prefixes = [
+
+            "open ",
+            "launch ",
+            "start ",
+            "run "
+
+        ]
+
+        # ===========================
+        # Wake Word Mistakes
+        # ===========================
+
+        self.wake_aliases = [
+
+            "jarvis",
+            "jarves",
+            "jarviso",
+            "jarviso",
+            "jarvish",
+            "jarvice",
+            "jarviss"
+
+        ]
+
+    # ==================================================
+
+    def best_match(self, word, options, cutoff=0.60):
+
+        match = difflib.get_close_matches(
+            word,
+            options,
+            n=1,
+            cutoff=cutoff
+        )
+
+        return match[0] if match else None
+
+    # ==================================================
+
+    def normalize(self, command):
 
         command = command.lower().strip()
 
+        command = " ".join(command.split())
+
+        replacements = {
+
+            "northpad": "notepad",
+            "nodepad": "notepad",
+            "note pad": "notepad",
+            "node pad": "notepad",
+
+            "vs code": "vscode",
+
+            "command": "cmd",
+
+            "google chrome": "chrome"
+
+        }
+
+        for wrong, right in replacements.items():
+
+            command = command.replace(
+                wrong,
+                right
+            )
+
+        return command
+
+    # ==================================================
+
+    def process(self, command):
+
+        command = self.normalize(command)
+
         JarvisLogger.info(
-            f"Processing Command: {command}"
+            f"Processing Command : {command}"
         )
 
-        # ==========================
-        # Memory Commands
-        # ==========================
+        if not command:
+            return None
+
+        # =====================================
+        # Remove accidental wake words
+        # =====================================
+
+        words = []
+
+        for word in command.split():
+
+            if word in self.wake_aliases:
+                continue
+
+            words.append(word)
+
+        command = " ".join(words).strip()
+
+        if not command:
+            return None
+
+        # =====================================
+        # Memory
+        # =====================================
 
         if command.startswith("remember my "):
+
             return (
+
                 "REMEMBER",
-                command.replace("remember my ", "", 1).strip()
+
+                command.replace(
+                    "remember my ",
+                    "",
+                    1
+                ).strip()
+
             )
 
         if command.startswith("what is my "):
+
             return (
+
                 "RECALL",
-                command.replace("what is my ", "", 1).strip()
+
+                command.replace(
+                    "what is my ",
+                    "",
+                    1
+                ).strip()
+
             )
 
         if command.startswith("tell me my "):
+
             return (
+
                 "RECALL",
-                command.replace("tell me my ", "", 1).strip()
+
+                command.replace(
+                    "tell me my ",
+                    "",
+                    1
+                ).strip()
+
             )
 
-        # ==========================
+        # =====================================
         # Typing
-        # ==========================
+        # =====================================
 
         if command.startswith("type "):
+
             return (
+
                 "TYPE_TEXT",
-                command.replace("type ", "", 1).strip()
+
+                command.replace(
+                    "type ",
+                    "",
+                    1
+                ).strip()
+
             )
 
-        # ==========================
+        # =====================================
         # Keyboard Keys
-        # ==========================
+        # =====================================
 
-        keys = {
+        key_commands = {
+
             "press enter": "PRESS_ENTER",
             "press tab": "PRESS_TAB",
             "press escape": "PRESS_ESCAPE",
@@ -57,17 +251,19 @@ class Brain:
             "press up": "PRESS_UP",
             "press down": "PRESS_DOWN",
             "press left": "PRESS_LEFT",
-            "press right": "PRESS_RIGHT",
+            "press right": "PRESS_RIGHT"
+
         }
 
-        if command in keys:
-            return keys[command]
+        if command in key_commands:
+            return key_commands[command]
 
-        # ==========================
+        # =====================================
         # Keyboard Shortcuts
-        # ==========================
+        # =====================================
 
         shortcuts = {
+
             "copy": "COPY",
             "paste": "PASTE",
             "cut": "CUT",
@@ -78,84 +274,36 @@ class Brain:
             "save file": "SAVE_FILE",
             "new file": "NEW_FILE",
             "close window": "CLOSE_WINDOW",
-            "refresh": "REFRESH",
+            "refresh": "REFRESH"
+
         }
 
         if command in shortcuts:
             return shortcuts[command]
 
-        # ==========================
-        # File Search
-        # ==========================
+        # ======= Continue in Part 2 =======
 
-        if command.startswith("find "):
-            return (
-                "SEARCH_FILE",
-                command.replace("find ", "", 1).strip()
-            )
+                # =====================================
+        # Alarm
+        # =====================================
 
-        if command.startswith("search file "):
-            return (
-                "SEARCH_FILE",
-                command.replace("search file ", "", 1).strip()
-            )
-
-        if command.startswith("locate "):
-            return (
-                "SEARCH_FILE",
-                command.replace("locate ", "", 1).strip()
-            )
-
-        # ==========================
-        # File Manager
-        # ==========================
-
-        if command in [
-            "open desktop",
-            "open my desktop"
-        ]:
-            return "OPEN_DESKTOP"
-
-        if command in [
-            "open downloads",
-            "downloads",
-            "download"
-        ]:
-            return "OPEN_DOWNLOADS"
-
-        if command in [
-            "open documents",
-            "documents",
-            "document"
-        ]:
-            return "OPEN_DOCUMENTS"
-
-        # ==========================
-        # Alarm & Reminder
-        # ==========================
-
-        if command.startswith("set alarm for "):
-
-            alarm_time = command.replace(
-                "set alarm for ",
-                "",
-                1
-            ).strip()
-
+        if command.startswith("set alarm for"):
             return (
                 "SET_ALARM",
-                alarm_time
+                command.replace("set alarm for", "", 1).strip()
             )
 
+        # =====================================
+        # Reminder
+        # =====================================
 
-        if command.startswith("remind me to "):
+        if command.startswith("remind me to"):
 
             text = command.replace(
-                "remind me to ",
+                "remind me to",
                 "",
                 1
             ).strip()
-
 
             if " at " in text:
 
@@ -171,95 +319,110 @@ class Brain:
                         reminder_time.strip()
                     )
                 )
-        # ==========================
-        # App Launcher
-        # ==========================
 
-        if command.startswith("open "):
+        # =====================================
+        # App Launcher (Improved)
+        # =====================================
 
-            app = command.replace(
-                "open ",
-                "",
-                1
-            ).strip()
+        app_alias = {
 
-            known_apps = [
+            "northpad": "notepad",
+            "note pad": "notepad",
+            "nodepad": "notepad",
+            "notepad": "notepad",
 
-                # Browsers
-                "chrome",
-                "google chrome",
-                "edge",
-                "firefox",
+            "calc": "calculator",
+            "calculator": "calculator",
 
-                # Development
-                "vscode",
-                "visual studio code",
-                "pycharm",
-                "android studio",
-                "git bash",
+            "paint": "paint",
 
-                # Windows
-                "notepad",
-                "calculator",
-                "paint",
-                "cmd",
-                "command prompt",
-                "explorer",
-                "file explorer",
-                "terminal",
+            "chrome": "chrome",
+            "google chrome": "chrome",
 
-                # Office
-                "word",
-                "excel",
-                "powerpoint",
+            "edge": "edge",
 
-                # Communication
-                "whatsapp",
-                "telegram",
-                "discord",
+            "firefox": "firefox",
 
-                # Media
-                "spotify",
-                "vlc",
+            "cmd": "command prompt",
+            "terminal": "command prompt",
+            "command prompt": "command prompt",
 
-                # Gaming
-                "steam"
-            ]
+            "explorer": "file explorer",
+            "file explorer": "file explorer",
 
-            if app in known_apps:
-                return (
-                    "OPEN_APP",
-                    app
+            "spotify": "spotify",
+
+            "telegram": "telegram",
+
+            "discord": "discord",
+
+            "whatsapp": "whatsapp",
+
+            "vscode": "visual studio code",
+            "vs code": "visual studio code",
+            "visual studio code": "visual studio code",
+
+            "pycharm": "pycharm",
+
+            "android studio": "android studio",
+
+            "steam": "steam",
+
+            "word": "word",
+
+            "excel": "excel",
+
+            "powerpoint": "powerpoint",
+
+            "vlc": "vlc"
+
+        }
+
+        app_prefixes = [
+
+            "open ",
+            "launch ",
+            "start ",
+            "run "
+
+        ]
+
+        for prefix in app_prefixes:
+
+            if command.startswith(prefix):
+
+                app = command.replace(
+                    prefix,
+                    "",
+                    1
+                ).strip()
+
+                if app in app_alias:
+
+                    return (
+                        "OPEN_APP",
+                        app_alias[app]
+                    )
+
+                from difflib import get_close_matches
+
+                match = get_close_matches(
+                    app,
+                    list(app_alias.keys()),
+                    n=1,
+                    cutoff=0.60
                 )
 
-        # ==========================
-        # System Commands
-        # ==========================
+                if match:
 
-        if "screenshot" in command:
-            return "TAKE_SCREENSHOT"
+                    return (
+                        "OPEN_APP",
+                        app_alias[match[0]]
+                    )
 
-        if "lock computer" in command or "lock pc" in command:
-            return "LOCK_PC"
-
-        if "open camera" in command or "start camera" in command:
-            return "OPEN_CAMERA"
-
-        if "take photo" in command or "capture photo" in command:
-            return "TAKE_PHOTO"
-
-        if "increase volume" in command or "volume up" in command:
-            return "VOLUME_UP"
-
-        if "decrease volume" in command or "volume down" in command:
-            return "VOLUME_DOWN"
-
-        if "mute volume" in command or command == "mute":
-            return "MUTE_VOLUME"
-
-        # ==========================
-        # Browser
-        # ==========================
+        # =====================================
+        # Browser Search
+        # =====================================
 
         if command.startswith("search ") and " on google" in command:
 
@@ -293,6 +456,24 @@ class Brain:
                 query
             )
 
+        # =====================================
+        # Website
+        # =====================================
+
+        website_alias = {
+
+            "youtube": "youtube",
+            "google": "google",
+            "github": "github",
+            "linkedin": "linkedin",
+            "gmail": "gmail",
+            "instagram": "instagram",
+            "facebook": "facebook",
+            "reddit": "reddit",
+            "chatgpt": "chatgpt"
+
+        }
+
         if command.startswith("open "):
 
             website = command.replace(
@@ -301,14 +482,119 @@ class Brain:
                 1
             ).strip()
 
-            return (
-                "OPEN_WEBSITE",
-                website
-            )
+            if website in website_alias:
 
-        # ==========================
+                return (
+                    "OPEN_WEBSITE",
+                    website_alias[website]
+                )
+
+        # =====================================
+        # Camera
+        # =====================================
+
+        if command in [
+
+            "open camera",
+            "start camera"
+
+        ]:
+
+            return "OPEN_CAMERA"
+
+        if command in [
+
+            "take photo",
+            "capture photo"
+
+        ]:
+
+            return "TAKE_PHOTO"
+
+        # =====================================
+        # Screenshot
+        # =====================================
+
+        if any(
+
+            word in command
+
+            for word in [
+
+                "screenshot",
+                "screen shot",
+                "capture screen"
+
+            ]
+
+        ):
+
+            return "TAKE_SCREENSHOT"
+
+        # =====================================
+        # Lock PC
+        # =====================================
+
+        if any(
+
+            word in command
+
+            for word in [
+
+                "lock pc",
+                "lock computer",
+                "lock system"
+
+            ]
+
+        ):
+
+            return "LOCK_PC"
+
+        # =====================================
+        # Volume
+        # =====================================
+
+        if any(
+
+            word in command
+
+            for word in [
+
+                "volume up",
+                "increase volume",
+                "raise volume",
+                "louder"
+
+            ]
+
+        ):
+
+            return "VOLUME_UP"
+
+        if any(
+
+            word in command
+
+            for word in [
+
+                "volume down",
+                "decrease volume",
+                "lower volume"
+
+            ]
+
+        ):
+
+            return "VOLUME_DOWN"
+
+        if "mute" in command:
+
+            return "MUTE_VOLUME"
+
+        # =====================================
         # Utility
-        # ==========================
+        # =====================================
 
         if "time" in command:
             return "GET_TIME"
@@ -322,36 +608,61 @@ class Brain:
         if "cpu" in command:
             return "GET_CPU"
 
-        if "ram" in command or "memory usage" in command:
+        if "ram" in command:
             return "GET_RAM"
 
-        if "disk" in command or "storage" in command:
+        if "disk" in command:
             return "GET_DISK"
 
-        # ==========================
+        # =====================================
         # Greetings
-        # ==========================
-
-        if command in ["hello", "hi", "hey"]:
-            return "GREET"
-
-        if "who are you" in command:
-            return "INTRO"
-
-        # ==========================
-        # Exit
-        # ==========================
+        # =====================================
 
         if command in [
+
+            "hello",
+            "hi",
+            "hey"
+
+        ]:
+
+            return "GREET"
+
+        if any(
+
+            x in command
+
+            for x in [
+
+                "who are you",
+                "introduce yourself"
+
+            ]
+
+        ):
+
+            return "INTRO"
+
+        # =====================================
+        # Exit
+        # =====================================
+
+        if command in [
+
             "exit",
             "quit",
+            "bye",
+            "goodbye",
+            "shutdown",
             "stop"
+
         ]:
+
             return "EXIT"
 
-        # ==========================
-        # AI Chat
-        # ==========================
+        # =====================================
+        # AI
+        # =====================================
 
         return (
             "AI_CHAT",

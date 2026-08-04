@@ -7,125 +7,147 @@ from automation.installed_apps import InstalledApps
 
 class AppLauncher:
 
+    # ======================================
+
+    APPS = {
+
+        # Browsers
+        "chrome": "start chrome",
+        "google chrome": "start chrome",
+        "edge": "start msedge",
+        "firefox": "start firefox",
+
+        # Development
+        "vscode": "code",
+        "visual studio code": "code",
+        "vs code": "code",
+
+        "pycharm": "pycharm64",
+        "android studio": "studio64",
+
+        "git bash": "git-bash",
+
+        "terminal": "start cmd",
+        "cmd": "start cmd",
+        "command prompt": "start cmd",
+
+        # Windows
+        "notepad": "notepad",
+        "calculator": "calc",
+        "calc": "calc",
+        "paint": "mspaint",
+
+        "explorer": "explorer",
+        "file explorer": "explorer",
+
+        # Office
+        "word": "start winword",
+        "excel": "start excel",
+        "powerpoint": "start powerpnt",
+
+        # Communication
+        "telegram": "start telegram",
+        "discord": "start discord",
+        "whatsapp": "start whatsapp",
+
+        # Media
+        "spotify": "spotify",
+        "vlc": "vlc",
+
+        # Gaming
+        "steam": "steam",
+
+    }
+
+    # ======================================
+
+    ALIASES = {
+
+        "note pad": "notepad",
+        "nodepad": "notepad",
+        "northpad": "notepad",
+        "not pad": "notepad",
+
+        "vs": "vscode",
+
+        "calc": "calculator",
+
+    }
+
+    # ======================================
+
     @staticmethod
     def open_app(app):
 
         app = app.lower().strip()
 
-        JarvisLogger.info(
-            f"Opening app: {app}"
+        app = AppLauncher.ALIASES.get(
+            app,
+            app
         )
 
-        apps = {
+        JarvisLogger.info(
+            f"Opening App : {app}"
+        )
 
-            # ==========================
-            # Browsers
-            # ==========================
+        # ----------------------------------
 
-            "chrome": "start chrome",
-            "google chrome": "start chrome",
+        if app in AppLauncher.APPS:
 
-            "edge": "start msedge",
+            try:
 
-            "firefox": "start firefox",
+                subprocess.Popen(
 
-            # ==========================
-            # Development
-            # ==========================
+                    AppLauncher.APPS[app],
 
-            "vscode": "code",
-            "visual studio code": "code",
+                    shell=True
 
-            "pycharm": "pycharm64",
+                )
 
-            "android studio": "studio64",
+                JarvisLogger.success(
+                    f"{app} launched."
+                )
 
-            "git bash": "git-bash",
+                return f"Opening {app}."
 
-            "terminal": "start cmd",
+            except Exception as e:
 
-            # ==========================
-            # Windows Apps
-            # ==========================
+                JarvisLogger.error(
+                    f"Launch Error : {e}"
+                )
 
-            "notepad": "notepad",
+                return f"Unable to open {app}."
 
-            "calculator": "calc",
+        # ----------------------------------
+        # Installed Apps
+        # ----------------------------------
 
-            "paint": "mspaint",
+        try:
 
-            "explorer": "explorer",
+            installed = InstalledApps.get_shortcuts()
 
-            "file explorer": "explorer",
+            for name, shortcut in installed.items():
 
-            "cmd": "start cmd",
+                if app in name.lower():
 
-            "command prompt": "start cmd",
+                    os.startfile(shortcut)
 
-            # ==========================
-            # Microsoft Office
-            # ==========================
+                    JarvisLogger.success(
+                        f"{name} launched."
+                    )
 
-            "word": "start winword",
+                    return f"Opening {name}."
 
-            "excel": "start excel",
+        except Exception as e:
 
-            "powerpoint": "start powerpnt",
-
-            # ==========================
-            # Communication
-            # ==========================
-
-            "whatsapp": "start whatsapp",
-
-            "telegram": "start telegram",
-
-            "discord": "start discord",
-
-            # ==========================
-            # Media
-            # ==========================
-
-            "spotify": "spotify",
-
-            "vlc": "vlc",
-
-            # ==========================
-            # Gaming
-            # ==========================
-
-            "steam": "steam",
-        }
-
-        # ==========================
-        # Hardcoded Apps
-        # ==========================
-
-        if app in apps:
-
-            subprocess.Popen(
-                apps[app],
-                shell=True
+            JarvisLogger.error(
+                f"Installed App Search Error : {e}"
             )
 
-            return f"Opening {app}."
+        # ----------------------------------
 
-        # ==========================
-        # Installed Apps Search
-        # ==========================
+        JarvisLogger.warning(
+            f"Unknown App : {app}"
+        )
 
-        installed_apps = InstalledApps.get_shortcuts()
-
-        for app_name, shortcut in installed_apps.items():
-
-            if app in app_name:
-
-                os.startfile(shortcut)
-
-                return f"Opening {app_name}."
-
-        # ==========================
-        # Not Found
-        # ==========================
-
-        return f"I don't know how to open {app}." 
+        return f"I couldn't find {app} on this computer."

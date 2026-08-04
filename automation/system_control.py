@@ -1,7 +1,8 @@
 import os
 import ctypes
-import pyautogui
 from datetime import datetime
+
+import pyautogui
 
 try:
     from PIL import ImageGrab
@@ -13,32 +14,52 @@ from core.logger import JarvisLogger
 
 class SystemControl:
 
+    pyautogui.FAILSAFE = True
+    pyautogui.PAUSE = 0.03
 
     # =====================================
-    # Volume Control
+    # Internal Helper
+    # =====================================
+
+    @staticmethod
+    def _press(key):
+
+        try:
+
+            pyautogui.press(key)
+
+            JarvisLogger.success(
+                f"Pressed : {key}"
+            )
+
+            return f"Pressed {key}."
+
+        except Exception as e:
+
+            JarvisLogger.error(
+                f"Key Press Error : {e}"
+            )
+
+            return "Unable to press key."
+
+    # =====================================
+    # Volume
     # =====================================
 
     @staticmethod
     def volume_up():
 
-        pyautogui.press("volumeup")
-        return "Volume increased."
-
+        return SystemControl._press("volumeup")
 
     @staticmethod
     def volume_down():
 
-        pyautogui.press("volumedown")
-        return "Volume decreased."
-
+        return SystemControl._press("volumedown")
 
     @staticmethod
     def mute_volume():
 
-        pyautogui.press("volumemute")
-        return "Volume muted."
-
-
+        return SystemControl._press("volumemute")
 
     # =====================================
     # Screenshot
@@ -48,41 +69,47 @@ class SystemControl:
     def take_screenshot():
 
         if ImageGrab is None:
+
             return "Pillow is not installed."
 
+        try:
 
-        folder = "screenshots"
+            folder = os.path.join(
+                os.getcwd(),
+                "screenshots"
+            )
 
-        os.makedirs(
-            folder,
-            exist_ok=True
-        )
+            os.makedirs(
+                folder,
+                exist_ok=True
+            )
 
+            filename = datetime.now().strftime(
+                "%Y%m%d_%H%M%S.png"
+            )
 
-        filename = datetime.now().strftime(
-            "%Y%m%d_%H%M%S.png"
-        )
+            path = os.path.join(
+                folder,
+                filename
+            )
 
+            image = ImageGrab.grab()
 
-        path = os.path.join(
-            folder,
-            filename
-        )
+            image.save(path)
 
+            JarvisLogger.success(
+                f"Screenshot Saved : {path}"
+            )
 
-        image = ImageGrab.grab()
+            return "Screenshot captured successfully."
 
-        image.save(path)
+        except Exception as e:
 
+            JarvisLogger.error(
+                f"Screenshot Error : {e}"
+            )
 
-        JarvisLogger.info(
-            f"Screenshot saved: {path}"
-        )
-
-
-        return "Screenshot taken successfully."
-
-
+            return "Unable to capture screenshot."
 
     # =====================================
     # Lock PC
@@ -91,15 +118,23 @@ class SystemControl:
     @staticmethod
     def lock_pc():
 
-        JarvisLogger.info(
-            "Locking PC"
-        )
+        try:
 
-        ctypes.windll.user32.LockWorkStation()
+            ctypes.windll.user32.LockWorkStation()
 
-        return "Locking your computer."
+            JarvisLogger.success(
+                "PC Locked"
+            )
 
+            return "Locking your computer."
 
+        except Exception as e:
+
+            JarvisLogger.error(
+                f"Lock Error : {e}"
+            )
+
+            return "Unable to lock computer."
 
     # =====================================
     # Type Text
@@ -108,155 +143,132 @@ class SystemControl:
     @staticmethod
     def type_text(text):
 
-        JarvisLogger.info(
-            f"Typing: {text}"
-        )
+        try:
 
+            pyautogui.write(
+                text,
+                interval=0.02
+            )
 
-        pyautogui.write(
-            text,
-            interval=0.03
-        )
+            JarvisLogger.success(
+                f"Typed : {text}"
+            )
 
+            return f"Typed {text}."
 
-        return f"Typed: {text}"
+        except Exception as e:
 
+            JarvisLogger.error(
+                f"Typing Error : {e}"
+            )
 
+            return "Unable to type."
 
     # =====================================
-    # Keyboard Keys
+    # Hotkeys
     # =====================================
 
     @staticmethod
-    def press_key(key):
+    def _hotkey(*keys):
 
-        JarvisLogger.info(
-            f"Pressing key: {key}"
-        )
+        try:
 
+            pyautogui.hotkey(*keys)
 
-        pyautogui.press(key)
+            JarvisLogger.success(
+                f"Hotkey : {' + '.join(keys)}"
+            )
 
+            return "Done."
 
-        return f"Pressed {key}."
+        except Exception as e:
 
+            JarvisLogger.error(
+                f"Hotkey Error : {e}"
+            )
 
-
-    # =====================================
-    # Keyboard Shortcuts
-    # =====================================
+            return "Unable to perform shortcut."
 
     @staticmethod
     def copy():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "c"
-        )
-
-        return "Copied."
-
+        return SystemControl._hotkey("ctrl", "c")
 
     @staticmethod
     def paste():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "v"
-        )
-
-        return "Pasted."
-
+        return SystemControl._hotkey("ctrl", "v")
 
     @staticmethod
     def cut():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "x"
-        )
-
-        return "Cut."
-
-
+        return SystemControl._hotkey("ctrl", "x")
 
     @staticmethod
     def undo():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "z"
-        )
-
-        return "Undo."
-
-
+        return SystemControl._hotkey("ctrl", "z")
 
     @staticmethod
     def redo():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "y"
-        )
-
-        return "Redo."
-
-
+        return SystemControl._hotkey("ctrl", "y")
 
     @staticmethod
     def select_all():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "a"
-        )
-
-        return "Selected all."
-
-
+        return SystemControl._hotkey("ctrl", "a")
 
     @staticmethod
     def save_file():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "s"
-        )
-
-        return "File saved."
-
-
+        return SystemControl._hotkey("ctrl", "s")
 
     @staticmethod
     def new_file():
-
-        pyautogui.hotkey(
-            "ctrl",
-            "n"
-        )
-
-        return "New file created."
-
-
+        return SystemControl._hotkey("ctrl", "n")
 
     @staticmethod
     def close_window():
-
-        pyautogui.hotkey(
-            "alt",
-            "f4"
-        )
-
-        return "Window closed."
-
-
+        return SystemControl._hotkey("alt", "f4")
 
     @staticmethod
     def refresh():
+        return SystemControl._press("f5")
 
-        pyautogui.press(
-            "f5"
-        )
+    # =====================================
+    # Individual Keys
+    # =====================================
 
-        return "Refreshed."
+    @staticmethod
+    def press_enter():
+        return SystemControl._press("enter")
+
+    @staticmethod
+    def press_tab():
+        return SystemControl._press("tab")
+
+    @staticmethod
+    def press_escape():
+        return SystemControl._press("esc")
+
+    @staticmethod
+    def press_backspace():
+        return SystemControl._press("backspace")
+
+    @staticmethod
+    def press_delete():
+        return SystemControl._press("delete")
+
+    @staticmethod
+    def press_space():
+        return SystemControl._press("space")
+
+    @staticmethod
+    def press_up():
+        return SystemControl._press("up")
+
+    @staticmethod
+    def press_down():
+        return SystemControl._press("down")
+
+    @staticmethod
+    def press_left():
+        return SystemControl._press("left")
+
+    @staticmethod
+    def press_right():
+        return SystemControl._press("right")

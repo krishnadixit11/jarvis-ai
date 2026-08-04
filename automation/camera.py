@@ -1,71 +1,169 @@
-import cv2
 import os
+import time
 from datetime import datetime
+
+import cv2
 
 from core.logger import JarvisLogger
 
 
 class CameraAutomation:
 
+    CAMERA_INDEX = 0
+
+    # ======================================
+
     @staticmethod
     def open_camera():
 
-        JarvisLogger.info("Opening Camera")
+        JarvisLogger.info(
+            "Opening Camera..."
+        )
 
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        camera = None
 
-        if not cap.isOpened():
-            return "Camera is not available."
+        try:
 
-        while True:
+            camera = cv2.VideoCapture(
+                CameraAutomation.CAMERA_INDEX,
+                cv2.CAP_DSHOW
+            )
 
-            ret, frame = cap.read()
+            if not camera.isOpened():
 
-            if not ret:
-                JarvisLogger.error("Unable to read camera frame")
-                break
+                JarvisLogger.error(
+                    "Camera not found."
+                )
 
-            cv2.imshow("Jarvis Camera", frame)
+                return "Camera is not available."
 
-            # Press Q to close camera
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            JarvisLogger.success(
+                "Camera Started."
+            )
 
-        cap.release()
-        cv2.destroyAllWindows()
+            while True:
 
-        return "Camera closed."
+                success, frame = camera.read()
 
+                if not success:
+
+                    JarvisLogger.error(
+                        "Failed to read camera frame."
+                    )
+
+                    break
+
+                cv2.imshow(
+                    "JARVIS Camera",
+                    frame
+                )
+
+                key = cv2.waitKey(1) & 0xFF
+
+                if key == ord("q") or key == 27:
+
+                    break
+
+            return "Camera closed."
+
+        except Exception as e:
+
+            JarvisLogger.error(
+                f"Camera Error : {e}"
+            )
+
+            return "Unable to open camera."
+
+        finally:
+
+            if camera is not None:
+
+                camera.release()
+
+            cv2.destroyAllWindows()
+
+    # ======================================
 
     @staticmethod
     def take_photo():
 
-        JarvisLogger.info("Taking Photo")
+        JarvisLogger.info(
+            "Capturing Photo..."
+        )
 
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        camera = None
 
-        if not cap.isOpened():
-            return "Camera is not available."
+        try:
 
-        ret, frame = cap.read()
+            camera = cv2.VideoCapture(
+                CameraAutomation.CAMERA_INDEX,
+                cv2.CAP_DSHOW
+            )
 
-        if ret:
+            if not camera.isOpened():
 
-            folder = "photos"
-            os.makedirs(folder, exist_ok=True)
+                JarvisLogger.error(
+                    "Camera not available."
+                )
 
-            filename = datetime.now().strftime("%Y%m%d_%H%M%S.jpg")
+                return "Camera is not available."
 
-            path = os.path.join(folder, filename)
+            # Camera warm-up
 
-            cv2.imwrite(path, frame)
+            time.sleep(1)
 
-            JarvisLogger.info(f"Photo saved: {path}")
+            success, frame = camera.read()
 
-            cap.release()
+            if not success:
 
-            return "Photo captured successfully."
+                JarvisLogger.error(
+                    "Unable to capture frame."
+                )
 
-        cap.release()
+                return "Unable to capture photo."
 
-        return "Unable to capture photo."
+            folder = os.path.join(
+                os.getcwd(),
+                "photos"
+            )
+
+            os.makedirs(
+                folder,
+                exist_ok=True
+            )
+
+            filename = datetime.now().strftime(
+                "%Y%m%d_%H%M%S.jpg"
+            )
+
+            filepath = os.path.join(
+                folder,
+                filename
+            )
+
+            cv2.imwrite(
+                filepath,
+                frame
+            )
+
+            JarvisLogger.success(
+                f"Photo Saved : {filepath}"
+            )
+
+            return f"Photo captured successfully."
+
+        except Exception as e:
+
+            JarvisLogger.error(
+                f"Photo Error : {e}"
+            )
+
+            return "Unable to capture photo."
+
+        finally:
+
+            if camera is not None:
+
+                camera.release()
+
+            cv2.destroyAllWindows()
